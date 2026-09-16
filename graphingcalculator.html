@@ -30,7 +30,7 @@
                     <label class="setting">Show axes <input id="show-axes" type="checkbox" checked></label>
                     <label class="setting">Zoom sensitivity <span class="range-row"><input id="zoom-speed" type="range" min="1" max="10" value="1"><output id="zoom-value">1</output></span></label>
                 </div>
-                <div class="examples">Try <code>sin(x)</code>, <code>x^2 / 4</code>, <code>abs(x - 2)</code>, or <code>2 * cos(x) + 1</code>.</div>
+                <div class="examples">Try <code>y = sin(x)</code>, <code>x + y = 4</code>, <code>y^2 = x</code>, or <code>2 * cos(x) + 1</code>.</div>
             </aside>
             <section class="plot-wrap">
                 <div class="plot-top"><span id="status">Ready to plot</span><div class="view-buttons"><button id="reset">Reset view</button><button id="clear">Clear all</button></div></div>
@@ -44,6 +44,8 @@
         <a class="side-tab active" href="graphingcalculator.html" aria-current="page">Graphing</a>
         <a class="side-tab" href="regularcalculator.html">Regular</a>
         <a class="side-tab" href="scientificcalculator.html">Scientific</a>
+        <a class="side-tab" href="colorcalculator.html">Color</a>
+        <a class="side-tab" href="moneyconverter.html">Money</a>
     </nav>
     <div class="settings-launcher">
         <section class="settings-panel" id="settings-panel" hidden aria-labelledby="settings-title">
@@ -101,7 +103,7 @@
         const tourTitle = document.getElementById('welcome-title');
         const tourDescription = document.getElementById('tour-description');
         const tourSteps = [
-            { target: '#expressions', title: 'Your expressions', description: 'Enter a function of <code>x</code>, such as <code>sin(x)</code> or <code>x^2 / 4</code>. You can also use simple arithmetic with <code>+</code>, <code>-</code>, <code>*</code>, and <code>/</code>.' },
+            { target: '#expressions', title: 'Your expressions', description: 'Enter a function or equation using <code>x</code> and <code>y</code>, such as <code>y = sin(x)</code>, <code>x + y = 4</code>, or <code>y^2 = x</code>.' },
             { target: '#add-expression', title: 'Compare functions', description: 'Add another expression to compare multiple curves. Each expression gets its own color.' },
             { target: '.settings', title: 'Tune the viewport', description: 'Toggle the grid and axes, then adjust the zoom sensitivity to match how you like to explore.' },
             { target: '.view-buttons', title: 'Manage the view', description: 'Reset the graph to the origin or clear every expression with these controls.' },
@@ -187,12 +189,20 @@
         }
 
         function compile(source) {
+            const parts = source.split('=');
+            if (parts.length > 1) {
+                if (parts.length !== 2 || !parts[0].trim() || !parts[1].trim()) throw new Error('Invalid equation');
+                const compileSide = side => side.toLowerCase().replace(/\^/g, '**').replace(/π/g, 'PI')
+                    .replace(/\b(sin|cos|tan|sqrt|abs|log|ln|exp|min|max|floor|ceil|round)\b/g, 'Math.$1')
+                    .replace(/\bpi\b/g, 'Math.PI').replace(/\be\b/g, 'Math.E');
+                return { implicit: true, fn: new Function('x', 'y', `return (${compileSide(parts[0])}) - (${compileSide(parts[1])});`) };
+            }
             let code = source.toLowerCase().replace(/\^/g, '**').replace(/π/g, 'PI');
             code = code.replace(/\b(sin|cos|tan|sqrt|abs|log|ln|exp|min|max|floor|ceil|round)\b/g, 'Math.$1');
             code = code.replace(/(\d+(?:\.\d+)?)\s*x\b/g, '$1 * x');
             code = code.replace(/\bx{2,}\b/g, match => Array(match.length).fill('x').join(' * '));
             code = code.replace(/\bpi\b/g, 'Math.PI').replace(/\be\b/g, 'Math.E');
-            return new Function('x', `return ${code};`);
+            return { implicit: false, fn: new Function('x', `return ${code};`) };
         }
 
         function toScreen(x, y) {
@@ -235,7 +245,13 @@
             drawGrid(); let plotted = 0, errors = 0;
             expressions.forEach((source, index) => {
                 if (!source.trim()) return;
-                let fn; try { fn = compile(source); } catch { errors++; return; }
+                let compiled; try { compiled = compile(source); } catch { errors++; return; }
+                if (compiled.implicit) {
+                    drawImplicit(compiled.fn, index);
+                    plotted++;
+                    return;
+                }
+                const fn = compiled.fn;
                 context.strokeStyle = colors[index % colors.length]; context.lineWidth = 2.5; context.beginPath(); let drawing = false;
                 for (let pixel = 0; pixel <= canvas.width; pixel += 1) {
                     const x = toWorld(pixel, 0).x; let y; try { y = Number(fn(x)); } catch { y = NaN; }
@@ -247,6 +263,31 @@
                 context.stroke(); plotted++;
             });
             status.textContent = errors ? `${plotted} plotted · ${errors} expression error` : `${plotted} expression${plotted === 1 ? '' : 's'} plotted`;
+        }
+
+        function drawImplicit(fn, index) {
+            context.fillStyle = colors[index % colors.length];
+            const drawRoots = (vertical, length, otherLength) => {
+                for (let fixed = 0; fixed <= length; fixed += 1) {
+                    let previousValue = null;
+                    let previousPosition = 0;
+                    for (let moving = 0; moving <= otherLength; moving += 1) {
+                        const point = vertical ? toWorld(fixed, moving) : toWorld(moving, fixed);
+                        let value;
+                        try { value = Number(fn(point.x, point.y)); } catch { value = NaN; }
+                        if (Number.isFinite(value) && previousValue !== null && Number.isFinite(previousValue) && (value === 0 || previousValue * value < 0)) {
+                            const fraction = previousValue / (previousValue - value);
+                            const root = previousPosition + fraction;
+                            if (vertical) context.fillRect(fixed, root, 2, 2);
+                            else context.fillRect(root, fixed, 2, 2);
+                        }
+                        previousValue = value;
+                        previousPosition = moving;
+                    }
+                }
+            };
+            drawRoots(true, canvas.width, canvas.height);
+            drawRoots(false, canvas.height, canvas.width);
         }
 
         function resize() { const ratio = window.devicePixelRatio || 1; canvas.width = canvas.clientWidth * ratio; canvas.height = canvas.clientHeight * ratio; context.setTransform(ratio, 0, 0, ratio, 0, 0); canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight; draw(); }

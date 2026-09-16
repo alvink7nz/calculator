@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>MATHEGRAPHICAL | Color Calculator</title>
+	<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+	<div class="app">
+		<header>
+			<div class="brand">
+				<img class="mark" src="mathegraphicallogo.svg" alt="Mathegraphical logo">
+				<div><h1>Mathegraphical</h1><p class="subtitle">Color calculator</p></div>
+			</div>
+			<div class="hint">Pick a color and read its values</div>
+		</header>
+		<main class="tool-main">
+			<section class="tool-panel color-picker-panel">
+				<p class="eyebrow">Color calculator</p>
+				<h2>Find your color values</h2>
+				<label class="picker-label" for="color-picker">Choose a color</label>
+				<input id="color-picker" class="large-color-picker" type="color" value="#e85d45">
+				<label class="text-input-label" for="hex-input">Hexadecimal</label>
+				<div class="inline-input"><input id="hex-input" value="#e85d45" maxlength="7" spellcheck="false"><button type="button" data-copy="hex-input">Copy</button></div>
+				<p class="tool-status" id="color-status" aria-live="polite">Color values update as you edit.</p>
+			</section>
+			<section class="tool-panel values-panel" aria-labelledby="values-title">
+				<p class="eyebrow">Readout</p>
+				<h2 id="values-title">Color values</h2>
+				<div class="value-list">
+					<div class="value-row"><span>RGB</span><strong id="rgb-value">232, 93, 69</strong><button type="button" data-copy-value="rgb-value">Copy</button></div>
+					<div class="value-row"><span>CMY</span><strong id="cmy-value">0%, 60%, 73%</strong><button type="button" data-copy-value="cmy-value">Copy</button></div>
+					<div class="value-row"><span>Hex</span><strong id="hex-value">#E85D45</strong><button type="button" data-copy-value="hex-value">Copy</button></div>
+				</div>
+				<div class="color-preview" id="color-preview" aria-label="Selected color preview"></div>
+			</section>
+		</main>
+	</div>
+	<nav class="side-tabs" aria-label="Calculator navigation">
+		<a class="side-tab" href="index.html">Home</a><a class="side-tab" href="graphingcalculator.html">Graphing</a><a class="side-tab" href="regularcalculator.html">Regular</a><a class="side-tab" href="scientificcalculator.html">Scientific</a><a class="side-tab active" href="colorcalculator.html" aria-current="page">Color</a><a class="side-tab" href="moneyconverter.html">Money</a>
+	</nav>
+	<div class="settings-launcher"><section class="settings-panel" id="settings-panel" hidden aria-labelledby="settings-title"><h2 id="settings-title">Colors</h2><label class="color-setting">Accent <input type="color" data-color-variable="--accent" value="#e85d45"></label><label class="color-setting">Ink <input type="color" data-color-variable="--ink" value="#152333"></label><label class="color-setting">Paper <input type="color" data-color-variable="--paper" value="#f5f1e9"></label><label class="color-setting">Panel <input type="color" data-color-variable="--panel" value="#fffdf8"></label><button class="settings-reset" id="settings-reset" type="button">Reset colors</button></section><button class="settings-toggle" id="settings-toggle" type="button" aria-expanded="false" aria-controls="settings-panel">Settings</button></div>
+	<script>
+		const colorPicker = document.getElementById('color-picker');
+		const hexInput = document.getElementById('hex-input');
+		const colorStatus = document.getElementById('color-status');
+		function updateColor(hex) {
+			const value = hex.trim().replace(/^#?/, '#');
+			if (!/^#[0-9a-f]{6}$/i.test(value)) { colorStatus.textContent = 'Enter a six-digit hex color.'; return; }
+			const red = parseInt(value.slice(1, 3), 16), green = parseInt(value.slice(3, 5), 16), blue = parseInt(value.slice(5, 7), 16);
+			colorPicker.value = value;
+			hexInput.value = value.toUpperCase();
+			document.getElementById('rgb-value').textContent = `${red}, ${green}, ${blue}`;
+			document.getElementById('cmy-value').textContent = `${Math.round((1 - red / 255) * 100)}%, ${Math.round((1 - green / 255) * 100)}%, ${Math.round((1 - blue / 255) * 100)}%`;
+			document.getElementById('hex-value').textContent = value.toUpperCase();
+			document.getElementById('color-preview').style.backgroundColor = value;
+			colorStatus.textContent = 'Color values updated.';
+		}
+		colorPicker.addEventListener('input', event => updateColor(event.target.value));
+		hexInput.addEventListener('input', event => updateColor(event.target.value));
+		document.querySelectorAll('[data-copy], [data-copy-value]').forEach(button => button.addEventListener('click', async () => {
+			const id = button.dataset.copy || button.dataset.copyValue;
+			await navigator.clipboard?.writeText(document.getElementById(id).value || document.getElementById(id).textContent);
+			colorStatus.textContent = 'Copied to clipboard.';
+		}));
+		updateColor(colorPicker.value);
+	</script>
+	<script src="settings.js"></script>
+</body>
+</html>

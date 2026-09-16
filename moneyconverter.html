@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>MATHEGRAPHICAL | Money Converter</title>
+	<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+	<div class="app">
+		<header><div class="brand"><img class="mark" src="mathegraphicallogo.svg" alt="Mathegraphical logo"><div><h1>Mathegraphical</h1><p class="subtitle">Money converter</p></div></div><div class="hint">Convert between common currencies</div></header>
+		<main class="tool-main money-main">
+			<section class="tool-panel converter-panel">
+				<p class="eyebrow">Money converter</p><h2>What is it worth?</h2>
+				<label class="text-input-label" for="amount">Amount</label><input class="amount-input" id="amount" type="number" min="0" step="any" value="100">
+				<div class="currency-grid"><label class="text-input-label" for="from-currency">From<select id="from-currency"></select></label><button class="swap-button" id="swap" type="button" aria-label="Swap currencies">⇄</button><label class="text-input-label" for="to-currency">To<select id="to-currency"></select></label></div>
+				<div class="conversion-result"><span id="result-label">100 USD equals</span><strong id="result">92.00 EUR</strong></div>
+				<p class="tool-status" id="money-status">Rates are indicative and stored in this calculator.</p>
+			</section>
+		</main>
+	</div>
+	<nav class="side-tabs" aria-label="Calculator navigation"><a class="side-tab" href="index.html">Home</a><a class="side-tab" href="graphingcalculator.html">Graphing</a><a class="side-tab" href="regularcalculator.html">Regular</a><a class="side-tab" href="scientificcalculator.html">Scientific</a><a class="side-tab" href="colorcalculator.html">Color</a><a class="side-tab active" href="moneyconverter.html" aria-current="page">Money</a></nav>
+	<div class="settings-launcher"><section class="settings-panel" id="settings-panel" hidden aria-labelledby="settings-title"><h2 id="settings-title">Colors</h2><label class="color-setting">Accent <input type="color" data-color-variable="--accent" value="#e85d45"></label><label class="color-setting">Ink <input type="color" data-color-variable="--ink" value="#152333"></label><label class="color-setting">Paper <input type="color" data-color-variable="--paper" value="#f5f1e9"></label><label class="color-setting">Panel <input type="color" data-color-variable="--panel" value="#fffdf8"></label><button class="settings-reset" id="settings-reset" type="button">Reset colors</button></section><button class="settings-toggle" id="settings-toggle" type="button" aria-expanded="false" aria-controls="settings-panel">Settings</button></div>
+	<script>
+		const rates = { USD: 1, EUR: 0.92, GBP: 0.78, JPY: 149.8, CAD: 1.36, AUD: 1.52, CHF: 0.88, CNY: 7.12, INR: 83.1, MXN: 18.4 };
+		const names = { USD: 'US Dollar', EUR: 'Euro', GBP: 'Pound Sterling', JPY: 'Japanese Yen', CAD: 'Canadian Dollar', AUD: 'Australian Dollar', CHF: 'Swiss Franc', CNY: 'Chinese Yuan', INR: 'Indian Rupee', MXN: 'Mexican Peso' };
+		const from = document.getElementById('from-currency'), to = document.getElementById('to-currency');
+		Object.keys(rates).forEach(code => { from.add(new Option(`${code} - ${names[code]}`, code)); to.add(new Option(`${code} - ${names[code]}`, code)); });
+		from.value = 'USD'; to.value = 'EUR';
+		function convert() { const amount = Number(document.getElementById('amount').value) || 0; const result = amount / rates[from.value] * rates[to.value]; document.getElementById('result-label').textContent = `${amount.toLocaleString()} ${from.value} equals`; document.getElementById('result').textContent = `${result.toLocaleString(undefined, { maximumFractionDigits: 2 })} ${to.value}`; }
+		document.getElementById('amount').addEventListener('input', convert); from.addEventListener('change', convert); to.addEventListener('change', convert);
+		document.getElementById('swap').addEventListener('click', () => { const value = from.value; from.value = to.value; to.value = value; convert(); });
+		convert();
+	</script>
+	<script src="settings.js"></script>
+</body>
+</html>

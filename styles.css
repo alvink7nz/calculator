@@ -13,6 +13,7 @@
 * { box-sizing: border-box; }
 body {
     margin: 0;
+    padding-top: 46px;
     color: var(--ink);
     background: var(--paper);
     font-family: Georgia, 'Times New Roman', serif;
@@ -39,33 +40,35 @@ h1 { margin: 0; font-size: clamp(28px, 4vw, 46px); letter-spacing: -1.5px; }
 .intro-button:hover { color: #fff; background: var(--accent); border-color: var(--accent); }
 .side-tabs {
     position: fixed;
-    top: 50%;
-    right: 0;
+    top: 0;
+    left: 0;
     z-index: 5;
     display: flex;
-    flex-direction: column;
-    gap: 6px;
-    transform: translateY(-50%);
+    width: 100%;
+    justify-content: center;
+    gap: 4px;
+    padding: 6px 16px;
+    background: var(--ink);
+    border-bottom: 1px solid var(--accent-dark);
 }
 .side-tab {
-    min-height: 116px;
+    min-height: 34px;
     display: grid;
     place-items: center;
-    padding: 12px 9px;
+    padding: 8px 14px;
     color: #fff;
-    background: var(--accent);
-    border: 1px solid var(--accent-dark);
-    writing-mode: vertical-rl;
+    background: transparent;
+    border: 1px solid transparent;
     text-decoration: none;
     font: 700 11px Arial, sans-serif;
     letter-spacing: .08em;
     text-transform: uppercase;
-    transition: background .2s ease, padding .2s ease;
+    transition: background .2s ease, border-color .2s ease;
 }
-.side-tab:hover, .side-tab.active { padding-right: 13px; background: var(--accent-dark); }
+.side-tab:hover, .side-tab.active { background: var(--accent-dark); border-color: var(--accent); }
 .settings-launcher {
     position: fixed;
-    top: 18px;
+    top: 58px;
     right: 18px;
     z-index: 8;
     display: flex;
@@ -209,6 +212,31 @@ canvas.dragging { cursor: grabbing; }
 .scientific-keys .clear:hover, .scientific-keys .equals:hover { background: var(--accent-dark); }
 .scientific-keys .equals { grid-column: span 2; }
 
+/* Color and money tools */
+.tool-main { width: min(960px, 100%); margin: 0 auto; padding: 42px clamp(16px, 5vw, 72px) 60px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+.tool-panel { padding: 28px; background: var(--panel); border: 1px solid var(--line); }
+.tool-panel h2 { margin-bottom: 26px; font-size: 30px; font-weight: 400; }
+.picker-label, .text-input-label { display: block; margin-bottom: 8px; color: var(--muted); font: 700 11px Arial, sans-serif; letter-spacing: .1em; text-transform: uppercase; }
+.large-color-picker { width: 100%; height: 190px; margin-bottom: 24px; padding: 0; border: 1px solid var(--line); background: transparent; cursor: pointer; }
+.inline-input { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+.inline-input input, .amount-input, select { width: 100%; padding: 12px; border: 1px solid var(--line); background: #fff; color: var(--ink); font: 17px Georgia, serif; }
+.inline-input button, .value-row button { padding: 8px 10px; color: var(--muted); background: #f1eee7; }
+.inline-input button:hover, .value-row button:hover { color: var(--ink); background: #e6e0d5; }
+.tool-status { margin: 18px 0 0; color: var(--muted); font: 12px/1.5 Arial, sans-serif; }
+.value-list { border-top: 1px solid var(--line); }
+.value-row { display: grid; grid-template-columns: 54px 1fr auto; gap: 12px; align-items: center; padding: 17px 0; border-bottom: 1px solid var(--line); font-family: Arial, sans-serif; }
+.value-row span { color: var(--muted); font-size: 12px; font-weight: 700; letter-spacing: .08em; }
+.value-row strong { font: 20px Georgia, serif; }
+.color-preview { height: 112px; margin-top: 24px; background: var(--accent); border: 1px solid var(--line); }
+.money-main { grid-template-columns: minmax(280px, 600px); justify-content: center; }
+.currency-grid { display: grid; grid-template-columns: 1fr 42px 1fr; gap: 10px; align-items: end; margin-top: 20px; }
+.currency-grid select { display: block; margin-top: 8px; font-size: 14px; }
+.swap-button { height: 42px; color: #fff; background: var(--ink); font-size: 20px; }
+.swap-button:hover { background: var(--accent-dark); }
+.conversion-result { margin-top: 30px; padding: 22px; background: #f1eee7; }
+.conversion-result span { display: block; color: var(--muted); font: 12px Arial, sans-serif; }
+.conversion-result strong { display: block; margin-top: 8px; font: 32px Georgia, serif; }
+
 @media (max-width: 760px) {
     header { align-items: start; padding: 20px 18px; }
     .hint { display: none; }
@@ -221,8 +249,9 @@ canvas.dragging { cursor: grabbing; }
     .home-main { padding: 24px 14px 30px; }
     .choices { grid-template-columns: 1fr; }
     .choice { min-height: 210px; }
+    .tool-main { grid-template-columns: 1fr; padding: 24px 14px 40px; }
 }
 @media (max-width: 560px) {
     .calculator-main { padding: 16px 14px 30px; }
-    .settings-launcher { top: 12px; right: 12px; }
+    .settings-launcher { top: 54px; right: 12px; }
 }
