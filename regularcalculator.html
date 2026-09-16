@@ -10,7 +10,7 @@
   <div class="app">
     <header>
       <div class="brand">
-        <div class="mark">∿</div>
+        <img class="mark" src="mathegraphicallogo.svg" alt="Mathegraphical logo">
         <div><h1>Mathegraphical</h1><p class="subtitle">A simple calculator</p></div>
       </div>
       <div class="hint">Keyboard supported</div>
@@ -41,6 +41,17 @@
     <a class="side-tab active" href="regularcalculator.html" aria-current="page">Regular</a>
     <a class="side-tab" href="scientificcalculator.html">Scientific</a>
   </nav>
+  <div class="settings-launcher">
+    <section class="settings-panel" id="settings-panel" hidden aria-labelledby="settings-title">
+      <h2 id="settings-title">Colors</h2>
+      <label class="color-setting">Accent <input type="color" data-color-variable="--accent" value="#e85d45"></label>
+      <label class="color-setting">Ink <input type="color" data-color-variable="--ink" value="#152333"></label>
+      <label class="color-setting">Paper <input type="color" data-color-variable="--paper" value="#f5f1e9"></label>
+      <label class="color-setting">Panel <input type="color" data-color-variable="--panel" value="#fffdf8"></label>
+      <button class="settings-reset" id="settings-reset" type="button">Reset colors</button>
+    </section>
+    <button class="settings-toggle" id="settings-toggle" type="button" aria-expanded="false" aria-controls="settings-panel">Settings</button>
+  </div>
   <script>
     const display = document.getElementById('display');
     let expression = '';
@@ -79,5 +90,6 @@
       render();
     });
   </script>
+  <script src="settings.js"></script>
 </body>
 </html>
