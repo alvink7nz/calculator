@@ -1,6 +1,6 @@
-# Plotline
+# Mathegraphical
 
-Plotline is a browser-based mathematical graphing machine. Enter one or more functions of `x` and view them on an interactive coordinate plane.
+Mathegraphical is a browser-based mathematical graphing machine. Enter one or more functions of `x` and view them on an interactive coordinate plane.
 
 ## Run
 
