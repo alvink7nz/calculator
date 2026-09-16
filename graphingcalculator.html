@@ -49,12 +49,20 @@
     </nav>
     <div class="settings-launcher">
         <section class="settings-panel" id="settings-panel" hidden aria-labelledby="settings-title">
+            <button class="settings-close" id="settings-close" type="button" aria-label="Close settings">×</button>
             <h2 id="settings-title">Colors</h2>
-            <label class="color-setting">Accent <input type="color" data-color-variable="--accent" value="#e85d45"></label>
-            <label class="color-setting">Ink <input type="color" data-color-variable="--ink" value="#152333"></label>
-            <label class="color-setting">Paper <input type="color" data-color-variable="--paper" value="#f5f1e9"></label>
-            <label class="color-setting">Panel <input type="color" data-color-variable="--panel" value="#fffdf8"></label>
-            <button class="settings-reset" id="settings-reset" type="button">Reset colors</button>
+            <div class="settings-content">
+                <p class="settings-section-title">Colors</p>
+                <label class="color-setting">Accent <input type="color" data-color-variable="--accent" value="#e85d45"></label>
+                <label class="color-setting">Ink <input type="color" data-color-variable="--ink" value="#152333"></label>
+                <label class="color-setting">Paper <input type="color" data-color-variable="--paper" value="#f5f1e9"></label>
+                <label class="color-setting">Panel <input type="color" data-color-variable="--panel" value="#fffdf8"></label>
+                <p class="settings-section-title">Typography</p>
+                <label class="font-setting">Font family <select id="font-family"><option value="Georgia">Georgia</option><option value="Arial">Arial</option><option value="Verdana">Verdana</option><option value="Courier New">Courier New</option></select></label>
+                <label class="font-setting">Font size <span><input id="font-size" type="range" min="13" max="22" value="16"><output id="font-size-value">16px</output></span></label>
+                <label class="font-setting">Line spacing <span><input id="line-height" type="range" min="1" max="2" step=".1" value="1.4"><output id="line-height-value">1.4</output></span></label>
+            </div>
+            <button class="settings-reset" id="settings-reset" type="button">Reset settings</button>
         </section>
         <button class="settings-toggle" id="settings-toggle" type="button" aria-expanded="false" aria-controls="settings-panel">Settings</button>
     </div>
