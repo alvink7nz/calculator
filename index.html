@@ -112,6 +112,8 @@
         }
         .welcome-panel h2 { margin-bottom: 12px; font-size: 28px; }
         .welcome-panel p { margin: 0 0 22px; color: var(--muted); font: 15px/1.6 Arial, sans-serif; }
+        .welcome-panel.intro-state { left: 50%; top: 50%; transform: translate(-50%, -50%); }
+        .welcome-panel.intro-state .tour-actions { justify-content: flex-end; }
         .tour-progress { margin-bottom: 10px !important; color: var(--accent-dark) !important; font: 700 11px Arial, sans-serif !important; letter-spacing: .13em; text-transform: uppercase; }
         .tour-actions { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
         .tour-skip { padding: 10px 0; color: var(--muted); background: transparent; }
@@ -180,6 +182,14 @@
     <div class="welcome" id="welcome" role="dialog" aria-modal="true" aria-labelledby="welcome-title">
         <div class="tour-highlight" id="tour-highlight"></div>
         <div class="tour-arrow" id="tour-arrow"></div>
+        <div class="welcome-panel intro-state" id="intro-panel">
+            <p class="tour-progress">Welcome to Plotline</p>
+            <h3>Graphing made simple.</h3>
+            <p>Draw functions, compare curves, and explore the mathematics behind them.</p>
+            <div class="tour-actions">
+                <button class="primary tour-next" id="intro-start">Start Graphing!</button>
+            </div>
+        </div>
         <div class="welcome-panel" id="tour-panel">
             <p class="tour-progress" id="tour-progress">Tour 1 of 5</p>
             <h2 id="welcome-title">Your expressions</h2>
@@ -202,6 +212,8 @@
         let drag = null;
 
         const welcome = document.getElementById('welcome');
+        const introPanel = document.getElementById('intro-panel');
+        const introStart = document.getElementById('intro-start');
         const welcomeStart = document.getElementById('welcome-start');
         const showIntroduction = document.getElementById('show-introduction');
         const tourSkip = document.getElementById('tour-skip');
@@ -219,7 +231,16 @@
             { target: '#graph', title: 'Explore the graph', description: 'Drag to pan, scroll to zoom, and move your pointer over the graph to read coordinates.' }
         ];
         let tourIndex = 0;
-        if (localStorage.getItem('plotline-intro-seen') === 'true') welcome.hidden = true;
+        const introductionSeen = localStorage.getItem('plotline-intro-seen') === 'true';
+        if (introductionSeen) welcome.hidden = true;
+        else tourPanel.hidden = true;
+        function startTour() {
+            introPanel.hidden = true;
+            tourPanel.hidden = false;
+            tourIndex = 0;
+            updateTour();
+            welcomeStart.focus();
+        }
         function updateTour() {
             const step = tourSteps[tourIndex];
             const target = document.querySelector(step.target);
@@ -243,11 +264,12 @@
             welcomeStart.textContent = tourIndex === tourSteps.length - 1 ? 'Finish' : 'Next';
         }
         function openIntroduction() {
-            tourIndex = 0;
             welcome.hidden = false;
-            updateTour();
-            welcomeStart.focus();
+            introPanel.hidden = false;
+            tourPanel.hidden = true;
+            introStart.focus();
         }
+        introStart.addEventListener('click', startTour);
         welcomeStart.addEventListener('click', () => {
             if (tourIndex < tourSteps.length - 1) {
                 tourIndex++;
@@ -363,8 +385,11 @@
         renderInputs(); resize();
         window.addEventListener('resize', () => { if (!welcome.hidden) updateTour(); });
         if (!welcome.hidden) {
-            updateTour();
-            welcomeStart.focus();
+            if (!introPanel.hidden) introStart.focus();
+            else {
+                updateTour();
+                welcomeStart.focus();
+            }
         }
     </script>
 </body>
