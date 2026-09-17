@@ -90,7 +90,7 @@ h1 { margin: 0; font-size: clamp(28px, 4vw, 46px); letter-spacing: -1.5px; }
     text-transform: uppercase;
     transition: background .2s ease, border-color .2s ease;
 }
-.side-tab:hover, .side-tab.active { background: var(--nav-hover); border-color: var(--accent); }
+.side-tab:hover, .side-tab.active { background: var(--accent); border-color: var(--accent); }
 .settings-launcher {
     position: fixed;
     top: 58px;
