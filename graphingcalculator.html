@@ -122,7 +122,7 @@
             { target: '#graph', title: 'Explore the graph', description: 'Drag to pan, scroll to zoom, and move your pointer over the graph to read coordinates.' }
         ];
         let tourIndex = 0;
-        const introductionSeen = localStorage.getItem('plotline-intro-seen') === 'true';
+        const introductionSeen = localStorage.getItem('mathegraphical-intro-seen') === 'true';
         if (introductionSeen) welcome.hidden = true;
         else tourPanel.hidden = true;
         function startTour() {
@@ -167,12 +167,12 @@
                 updateTour();
                 return;
             }
-            localStorage.setItem('plotline-intro-seen', 'true');
+            localStorage.setItem('mathegraphical-intro-seen', 'true');
             welcome.hidden = true;
             document.querySelector('#expressions input')?.focus();
         });
         tourSkip.addEventListener('click', () => {
-            localStorage.setItem('plotline-intro-seen', 'true');
+            localStorage.setItem('mathegraphical-intro-seen', 'true');
             welcome.hidden = true;
         });
         showIntroduction.addEventListener('click', openIntroduction);
@@ -252,6 +252,117 @@
             for (let y = Math.floor(bottom / step) * step; y <= top; y += step) { if (Math.abs(y) > step / 4) context.fillText(Number(y.toFixed(4)), Math.max(3, toScreen(0, y).x + 5), toScreen(0, y).y - 3); }
         }
 
+        function evaluateExpression(fn, x) {
+            try {
+                const value = Number(fn(x));
+                return Number.isFinite(value) ? value : null;
+            } catch {
+                return null;
+            }
+        }
+
+        function findIntersections() {
+            const xMin = Math.min(toWorld(0, 0).x, toWorld(canvas.width, 0).x);
+            const xMax = Math.max(toWorld(0, 0).x, toWorld(canvas.width, 0).x);
+            const compiled = [];
+            expressions.forEach(source => {
+                if (!source.trim()) return;
+                try {
+                    const parsed = compile(source);
+                    if (!parsed.implicit) compiled.push(parsed.fn);
+                } catch {
+                    // Ignore invalid expressions when searching for intersections.
+                }
+            });
+
+            const intersections = [];
+            for (let i = 0; i < compiled.length; i++) {
+                for (let j = i + 1; j < compiled.length; j++) {
+                    const left = compiled[i];
+                    const right = compiled[j];
+                    let previousX = null;
+                    let previousDiff = null;
+                    for (let sample = 0; sample <= 600; sample += 1) {
+                        const x = xMin + ((xMax - xMin) * sample) / 600;
+                        const leftY = evaluateExpression(left, x);
+                        const rightY = evaluateExpression(right, x);
+                        if (leftY === null || rightY === null) {
+                            previousX = null;
+                            previousDiff = null;
+                            continue;
+                        }
+                        const diff = leftY - rightY;
+                        if (previousX !== null && previousDiff !== null && previousDiff * diff <= 0) {
+                            let low = previousX;
+                            let high = x;
+                            let lowDiff = previousDiff;
+                            let highDiff = diff;
+                            for (let step = 0; step < 40; step += 1) {
+                                const midX = (low + high) / 2;
+                                const midLeft = evaluateExpression(left, midX);
+                                const midRight = evaluateExpression(right, midX);
+                                if (midLeft === null || midRight === null) break;
+                                const midDiff = midLeft - midRight;
+                                if (Math.abs(midDiff) < 1e-6 || Math.abs(high - low) < 1e-9) {
+                                    low = midX;
+                                    lowDiff = midDiff;
+                                    break;
+                                }
+                                if (lowDiff * midDiff <= 0) {
+                                    high = midX;
+                                    highDiff = midDiff;
+                                } else {
+                                    low = midX;
+                                    lowDiff = midDiff;
+                                }
+                            }
+                            const rootX = (low + high) / 2;
+                            const rootLeft = evaluateExpression(left, rootX);
+                            const rootRight = evaluateExpression(right, rootX);
+                            if (rootLeft !== null && rootRight !== null) {
+                                const rootY = (rootLeft + rootRight) / 2;
+                                intersections.push({ x: rootX, y: rootY });
+                            }
+                        }
+                        previousX = x;
+                        previousDiff = diff;
+                    }
+                }
+            }
+
+            const unique = [];
+            intersections.forEach(point => {
+                const duplicate = unique.some(existing => Math.abs(existing.x - point.x) < 0.02 && Math.abs(existing.y - point.y) < 0.02);
+                if (!duplicate) unique.push(point);
+            });
+            return unique.slice(0, 12);
+        }
+
+        function drawIntersectionLabels(points) {
+            if (!points.length) return;
+            context.font = '11px Arial';
+            points.forEach(point => {
+                const screen = toScreen(point.x, point.y);
+                if (screen.x < -30 || screen.x > canvas.width + 30 || screen.y < -30 || screen.y > canvas.height + 30) return;
+                context.beginPath();
+                context.fillStyle = '#111827';
+                context.strokeStyle = '#fff';
+                context.lineWidth = 2;
+                context.arc(screen.x, screen.y, 4.5, 0, Math.PI * 2);
+                context.fill();
+                context.stroke();
+
+                const label = `(${point.x.toFixed(2)}, ${point.y.toFixed(2)})`;
+                const labelX = screen.x + 10;
+                const labelY = screen.y - 10;
+                const width = context.measureText(label).width + 8;
+                context.fillStyle = 'rgba(255,255,255,0.92)';
+                context.fillRect(labelX - 4, labelY - 12, width, 18);
+                context.fillStyle = '#111827';
+                context.fillText(label, labelX, labelY);
+            });
+        }
+
         function draw() {
             if (!canvas.width) return;
             drawGrid(); let plotted = 0, errors = 0;
@@ -274,6 +385,7 @@
                 }
                 context.stroke(); plotted++;
             });
+            drawIntersectionLabels(findIntersections());
             status.textContent = errors ? `${plotted} plotted · ${errors} expression error` : `${plotted} expression${plotted === 1 ? '' : 's'} plotted`;
         }
 
