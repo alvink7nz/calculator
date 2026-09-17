@@ -8,6 +8,25 @@
     --accent-dark: #bc3d2d;
     --grid: #dfe4e7;
     --axis: #263746;
+    --nav-bg: #152333;
+    --nav-text: #ffffff;
+    --nav-hover: #bc3d2d;
+    --button-radius: 12px;
+}
+
+:root[data-theme="dark"] {
+    --ink: #edf2f7;
+    --muted: #a9b8c8;
+    --paper: #101923;
+    --panel: #1b2633;
+    --line: #2d3b4e;
+    --accent: #f08b71;
+    --accent-dark: #d45f3d;
+    --grid: #243246;
+    --axis: #edf2f7;
+    --nav-bg: #1d2b39;
+    --nav-text: #edf2f7;
+    --nav-hover: #d45f3d;
 }
 
 * { box-sizing: border-box; }
@@ -19,6 +38,10 @@ body {
     font-family: var(--font-family, Georgia), 'Times New Roman', serif;
     font-size: var(--font-size, 16px);
     line-height: var(--line-height, 1.4);
+}
+
+button, .choice-label, .settings-toggle, .settings-close, .settings-reset, .keys button, .scientific-keys button, .toggle-button, .swap-button, .mode-toggle, .primary, .tour-next {
+    border-radius: var(--button-radius, 12px);
 }
 
 .app { min-height: 100vh; display: grid; grid-template-rows: auto 1fr; }
@@ -50,7 +73,7 @@ h1 { margin: 0; font-size: clamp(28px, 4vw, 46px); letter-spacing: -1.5px; }
     justify-content: center;
     gap: 4px;
     padding: 6px 16px;
-    background: var(--ink);
+    background: var(--nav-bg);
     border-bottom: 1px solid var(--accent-dark);
 }
 .side-tab {
@@ -58,7 +81,7 @@ h1 { margin: 0; font-size: clamp(28px, 4vw, 46px); letter-spacing: -1.5px; }
     display: grid;
     place-items: center;
     padding: 8px 14px;
-    color: #fff;
+    color: var(--nav-text);
     background: transparent;
     border: 1px solid transparent;
     text-decoration: none;
@@ -67,7 +90,7 @@ h1 { margin: 0; font-size: clamp(28px, 4vw, 46px); letter-spacing: -1.5px; }
     text-transform: uppercase;
     transition: background .2s ease, border-color .2s ease;
 }
-.side-tab:hover, .side-tab.active { background: var(--accent-dark); border-color: var(--accent); }
+.side-tab:hover, .side-tab.active { background: var(--nav-hover); border-color: var(--accent); }
 .settings-launcher {
     position: fixed;
     top: 58px;

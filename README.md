@@ -131,6 +131,87 @@ Every calculator page includes:
 
 Color preferences are stored in browser `localStorage` and can be reset from the Settings panel.
 
+## Settings
+
+The app includes a shared Settings panel on each page so users can tailor the interface to their preferences.
+
+### Appearance
+
+- Change the accent color used for highlights and buttons.
+- Adjust the ink color for text.
+- Change the paper background color.
+- Change the panel color used for cards and containers.
+
+### Typography
+
+- Select a font family.
+- Adjust the base font size.
+- Change the line height for easier reading.
+
+### Decimal Places
+Add a setting that allows the user to choose how many decimal places are displayed in the calculator results.
+
+Options should include:
+
+* Automatic
+* 0 decimal places
+* 1 decimal place
+* 2 decimal places
+* 3 decimal places
+* 4 decimal places
+* 5 decimal places
+* 6 decimal places
+* 7 decimal places
+* 8 decimal places
+* 9 decimal places
+* 10 decimal places
+
+The selected option should be saved using localStorage so it remains after refreshing the page.
+
+### Dark / Light Mode
+Add a theme setting that allows the user to switch between:
+
+* Light mode
+* Dark mode
+* System default
+
+The selected theme should be saved using localStorage and automatically applied when the website is opened again.
+
+### Button Style
+Add a setting that allows the user to change the appearance of the calculator buttons.
+
+Options should include:
+
+* Rounded
+* Square
+* Pill-shaped
+
+The selected button style should be saved using localStorage and applied to all calculator buttons.
+
+### Keyboard Controls
+Add keyboard support for the calculator.
+
+The following keyboard inputs should work:
+
+* Number keys (`0–9`) → enter numbers
+* `+` → addition
+* `-` → subtraction
+* `*` → multiplication
+* `/` → division
+* `.` → decimal point
+* `Enter` → equals
+* `Backspace` → delete the last character
+* `Escape` → clear the calculator
+
+Keyboard controls should work alongside the existing on-screen buttons without changing their current functionality.
+
+
+### Persistence
+
+All of these customizations are saved in the browser using `localStorage`, so the same theme and layout settings are preserved when the user revisits the app.
+
+The settings can be reset back to the original defaults from the Settings panel at any time.
+
 ## Project Files
 
 - `index.html` - Home page and tool chooser.
@@ -146,3 +227,4 @@ Color preferences are stored in browser `localStorage` and can be reset from the
 ## Technology
 
 Mathegraphical uses plain HTML, CSS, and browser JavaScript. There are no npm packages, build tools, or server-side components.
+
