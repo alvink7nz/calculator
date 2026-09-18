@@ -129,6 +129,8 @@ h1 { margin: 0; font-size: clamp(28px, 4vw, 46px); letter-spacing: -1.5px; }
 .font-setting { display: grid; grid-template-columns: 1fr minmax(180px, 260px); gap: 18px; align-items: center; padding: 10px 0; color: var(--muted); font: 13px Arial, sans-serif; }
 .font-setting select, .font-setting input { width: 100%; padding: 9px; color: var(--ink); background: #fff; border: 1px solid var(--line); }
 .font-setting output { margin-left: 8px; color: var(--ink); }
+.upload-font-setting { display: grid; grid-template-columns: 1fr minmax(180px, 260px); gap: 18px; align-items: center; }
+.upload-font-setting input { padding: 7px 9px; }
 .settings-reset { width: 100%; margin-top: 14px; padding: 11px; color: var(--muted); background: #f1eee7; }
 .settings-reset:hover { color: var(--ink); background: #e6e0d5; }
 

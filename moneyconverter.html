@@ -26,9 +26,12 @@
 		const fallbackRates = { USD: 1, EUR: 0.92, GBP: 0.78, JPY: 149.8, CAD: 1.36, AUD: 1.52, CHF: 0.88, CNY: 7.12, INR: 83.1, MXN: 18.4, AED: 3.67, SEK: 10.2, NZD: 1.64, SGD: 1.35, NOK: 10.59, ZAR: 18.15, KRW: 1365, BRL: 5.48, TRY: 32.7, PHP: 58.2, HKD: 7.79, DKK: 6.86, PLN: 3.9, IDR: 16250, SAR: 3.75, EGP: 49.2, RUB: 92.5 };
 		const fallbackNames = { USD: 'US Dollar', EUR: 'Euro', GBP: 'Pound Sterling', JPY: 'Japanese Yen', CAD: 'Canadian Dollar', AUD: 'Australian Dollar', CHF: 'Swiss Franc', CNY: 'Chinese Yuan', INR: 'Indian Rupee', MXN: 'Mexican Peso', AED: 'UAE Dirham', SEK: 'Swedish Krona', NZD: 'New Zealand Dollar', SGD: 'Singapore Dollar', NOK: 'Norwegian Krone', ZAR: 'South African Rand', KRW: 'South Korean Won', BRL: 'Brazilian Real', TRY: 'Turkish Lira', PHP: 'Philippine Peso', HKD: 'Hong Kong Dollar', DKK: 'Danish Krone', PLN: 'Polish Zloty', IDR: 'Indonesian Rupiah', SAR: 'Saudi Riyal', EGP: 'Egyptian Pound', RUB: 'Russian Ruble' };
 		const STORAGE_KEY = 'mathegraphical-money-state';
+		const LIVE_RATE_URL = 'https://api.frankfurter.app/latest';
+		const isFileProtocol = window.location.protocol === 'file:';
 		const from = document.getElementById('from-currency'), to = document.getElementById('to-currency');
 		let rates = fallbackRates;
 		let names = fallbackNames;
+		let liveRateStatus = 'Using local currency rates.';
 
 		function saveMoneyState() {
 			try {
@@ -76,28 +79,62 @@
 			saveMoneyState();
 		}
 
-		async function loadCurrencies() {
+		async function refreshLiveRates() {
+			const codes = Object.keys(fallbackRates).join(',');
+			if (isFileProtocol) {
+				rates = fallbackRates;
+				liveRateStatus = 'Live currency data requires this app to be served over HTTP, not opened as a local file. Showing local fallback rates.';
+				document.getElementById('money-status').textContent = liveRateStatus;
+				populateCurrencyOptions();
+				convert();
+				return;
+			}
+
 			try {
-				const response = await fetch('currencies.json');
-				if (!response.ok) throw new Error('Failed to load currencies.json');
+				const response = await fetch(`${LIVE_RATE_URL}?from=USD&to=${codes}`, { cache: 'no-store' });
+				if (!response.ok) throw new Error('Live API unavailable');
 				const data = await response.json();
 				if (data && data.rates) {
-					rates = { ...fallbackRates, ...data.rates };
+					const liveRates = { USD: 1 };
+					Object.entries(data.rates).forEach(([code, rate]) => {
+						liveRates[code] = Number(rate);
+					});
+					rates = { ...fallbackRates, ...liveRates };
+					liveRateStatus = 'Live rates from Frankfurter are active.';
 				}
-				if (data && data.names) {
-					names = { ...fallbackNames, ...data.names };
+			} catch (error) {
+				rates = fallbackRates;
+				liveRateStatus = 'Live rates unavailable. Showing local fallback rates.';
+			}
+			document.getElementById('money-status').textContent = liveRateStatus;
+			populateCurrencyOptions();
+			convert();
+		}
+
+		async function loadCurrencies() {
+			try {
+				if (!isFileProtocol) {
+					const response = await fetch('currencies.json');
+					if (!response.ok) throw new Error('Failed to load currencies.json');
+					const data = await response.json();
+					if (data && data.rates) {
+						rates = { ...fallbackRates, ...data.rates };
+					}
+					if (data && data.names) {
+						names = { ...fallbackNames, ...data.names };
+					}
 				}
 			} catch (error) {
 				rates = fallbackRates;
 				names = fallbackNames;
 			}
-			populateCurrencyOptions();
-			convert();
+			await refreshLiveRates();
 		}
 
 		document.getElementById('amount').addEventListener('input', convert); from.addEventListener('change', convert); to.addEventListener('change', convert);
 		document.getElementById('swap').addEventListener('click', () => { const value = from.value; from.value = to.value; to.value = value; convert(); });
 		loadCurrencies();
+		setInterval(refreshLiveRates, 15 * 60 * 1000);
 	</script>
 	<script src="settings.js"></script>
 </body>

@@ -1,0 +1,59 @@
+{
+  "fonts": [
+    {
+      "family": "Arial",
+      "styles": ["regular", "bold", "italic", "bold italic"],
+      "sizes": [8, 10, 12, 14, 16, 18, 20, 24, 28, 32, 36, 48, 64]
+    },
+    {
+      "family": "Verdana",
+      "styles": ["regular", "bold", "italic", "bold italic"],
+      "sizes": [8, 10, 12, 14, 16, 18, 20, 24, 28, 32, 36, 48]
+    },
+    {
+      "family": "Tahoma",
+      "styles": ["regular", "bold", "italic", "bold italic"],
+      "sizes": [8, 10, 11, 12, 14, 16, 18, 20, 24, 28, 32]
+    },
+    {
+      "family": "Trebuchet MS",
+      "styles": ["regular", "bold", "italic", "bold italic"],
+      "sizes": [8, 10, 12, 14, 16, 18, 20, 24, 28, 32, 36]
+    },
+    {
+      "family": "Georgia",
+      "styles": ["regular", "bold", "italic", "bold italic"],
+      "sizes": [8, 10, 12, 14, 16, 18, 20, 24, 28, 32, 36, 48]
+    },
+    {
+      "family": "Times New Roman",
+      "styles": ["regular", "bold", "italic", "bold italic"],
+      "sizes": [8, 10, 12, 14, 16, 18, 20, 24, 28, 32, 36, 48, 64]
+    },
+    {
+      "family": "Courier New",
+      "styles": ["regular", "bold", "italic", "bold italic"],
+      "sizes": [8, 10, 12, 14, 16, 18, 20, 24, 28, 32, 36, 48]
+    },
+    {
+      "family": "Lucida Console",
+      "styles": ["regular", "bold"],
+      "sizes": [8, 10, 12, 14, 16, 18, 20, 24, 28, 32]
+    },
+    {
+      "family": "Impact",
+      "styles": ["regular"],
+      "sizes": [10, 12, 14, 16, 18, 20, 24, 28, 32, 36, 48, 64, 72]
+    },
+    {
+      "family": "Comic Sans MS",
+      "styles": ["regular", "bold", "italic", "bold italic"],
+      "sizes": [8, 10, 12, 14, 16, 18, 20, 24, 28, 32, 36]
+    },
+    {
+      "family": "Segoe UI",
+      "styles": ["regular", "bold", "italic", "bold italic"],
+      "sizes": [8, 10, 12, 14, 16, 18, 20, 24, 28, 32, 36, 48, 64]
+    }
+  ]
+}
