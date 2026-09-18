@@ -45,6 +45,26 @@
 		const colorPicker = document.getElementById('color-picker');
 		const hexInput = document.getElementById('hex-input');
 		const colorStatus = document.getElementById('color-status');
+		const STORAGE_KEY = 'mathegraphical-color-state';
+
+		function saveColorState(color) {
+			try {
+				localStorage.setItem(STORAGE_KEY, JSON.stringify({ color }));
+			} catch {
+				// Ignore storage failures.
+			}
+		}
+
+		function restoreColorState() {
+			try {
+				const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+				if (typeof saved.color === 'string' && /^#[0-9a-f]{6}$/i.test(saved.color)) return saved.color;
+			} catch {
+				// Ignore invalid storage.
+			}
+			return '#e85d45';
+		}
+
 		function updateColor(hex) {
 			const value = hex.trim().replace(/^#?/, '#');
 			if (!/^#[0-9a-f]{6}$/i.test(value)) { colorStatus.textContent = 'Enter a six-digit hex color.'; return; }
@@ -56,6 +76,7 @@
 			document.getElementById('hex-value').textContent = value.toUpperCase();
 			document.getElementById('color-preview').style.backgroundColor = value;
 			colorStatus.textContent = 'Color values updated.';
+			saveColorState(value);
 		}
 		colorPicker.addEventListener('input', event => updateColor(event.target.value));
 		hexInput.addEventListener('input', event => updateColor(event.target.value));
@@ -64,6 +85,7 @@
 			await navigator.clipboard?.writeText(document.getElementById(id).value || document.getElementById(id).textContent);
 			colorStatus.textContent = 'Copied to clipboard.';
 		}));
+		colorPicker.value = restoreColorState();
 		updateColor(colorPicker.value);
 	</script>
 	<script src="settings.js"></script>

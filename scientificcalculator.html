@@ -88,8 +88,28 @@
 <script>
     const display = document.getElementById('scientific-display');
     const angleMode = document.getElementById('angle-mode');
+    const STORAGE_KEY = 'mathegraphical-scientific-state';
     let expression = '';
     let degrees = true;
+
+    function saveState() {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify({ expression, degrees }));
+        } catch {
+            // Ignore storage failures.
+        }
+    }
+
+    function restoreState() {
+        try {
+            const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+            if (typeof saved.expression === 'string') expression = saved.expression;
+            if (typeof saved.degrees === 'boolean') degrees = saved.degrees;
+        } catch {
+            expression = '';
+            degrees = true;
+        }
+    }
 
     function formatResult(value) {
         const selected = window.mathegraphicalSettings?.get('--decimal-places', 'auto') || 'auto';
@@ -129,6 +149,7 @@
             expression = '';
             display.value = 'Error';
         }
+        saveState();
         render();
     }
     document.querySelector('.scientific-keys').addEventListener('click', event => {
@@ -139,12 +160,14 @@
         else if (action === 'backspace') expression = expression.slice(0, -1);
         else if (action === 'equals') return calculate();
         else expression += value;
+        saveState();
         render();
     });
     angleMode.addEventListener('click', () => {
         degrees = !degrees;
         angleMode.textContent = degrees ? 'DEG' : 'RAD';
         angleMode.setAttribute('aria-label', degrees ? 'Switch to radians' : 'Switch to degrees');
+        saveState();
     });
     document.addEventListener('keydown', event => {
         const key = event.key;
@@ -154,8 +177,13 @@
         else if (key === 'Backspace') expression = expression.slice(0, -1);
         else if (key === 'Escape') expression = '';
         else return;
+        saveState();
         render();
     });
+    restoreState();
+    angleMode.textContent = degrees ? 'DEG' : 'RAD';
+    angleMode.setAttribute('aria-label', degrees ? 'Switch to radians' : 'Switch to degrees');
+    render();
 </script>
 <script src="settings.js"></script>
 </body>
