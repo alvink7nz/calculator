@@ -17,6 +17,7 @@
 				<div class="conversion-result"><span id="result-label">100 USD equals</span><strong id="result">92.00 EUR</strong></div>
 				<p class="tool-status" id="conversion-rate">1 USD = 0.92 EUR</p>
 				<p class="tool-status" id="money-status">Rates are indicative and stored in this calculator.</p>
+				<button class="primary" id="refresh-rates" type="button">Refresh live rates</button>
 			</section>
 		</main>
 	</div>
@@ -80,17 +81,21 @@
 		}
 
 		async function refreshLiveRates() {
+			const refreshButton = document.getElementById('refresh-rates');
 			const codes = Object.keys(fallbackRates).join(',');
+			if (refreshButton) refreshButton.disabled = true;
 			if (isFileProtocol) {
 				rates = fallbackRates;
 				liveRateStatus = 'Live currency data requires this app to be served over HTTP, not opened as a local file. Showing local fallback rates.';
 				document.getElementById('money-status').textContent = liveRateStatus;
 				populateCurrencyOptions();
 				convert();
+				if (refreshButton) refreshButton.disabled = false;
 				return;
 			}
 
 			try {
+				document.getElementById('money-status').textContent = 'Refreshing live exchange rates...';
 				const response = await fetch(`${LIVE_RATE_URL}?from=USD&to=${codes}`, { cache: 'no-store' });
 				if (!response.ok) throw new Error('Live API unavailable');
 				const data = await response.json();
@@ -105,6 +110,8 @@
 			} catch (error) {
 				rates = fallbackRates;
 				liveRateStatus = 'Live rates unavailable. Showing local fallback rates.';
+			} finally {
+				if (refreshButton) refreshButton.disabled = false;
 			}
 			document.getElementById('money-status').textContent = liveRateStatus;
 			populateCurrencyOptions();
@@ -133,6 +140,7 @@
 
 		document.getElementById('amount').addEventListener('input', convert); from.addEventListener('change', convert); to.addEventListener('change', convert);
 		document.getElementById('swap').addEventListener('click', () => { const value = from.value; from.value = to.value; to.value = value; convert(); });
+		document.getElementById('refresh-rates').addEventListener('click', refreshLiveRates);
 		loadCurrencies();
 		setInterval(refreshLiveRates, 15 * 60 * 1000);
 	</script>
