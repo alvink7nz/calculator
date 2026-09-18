@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Mathegraphical | A minimalistic, compact, and customizable calculator</title>
+	<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+	<div class="app">
+		<header><div class="brand"><img class="mark" src="mathegraphicallogo.svg" alt="Mathegraphical logo"><div><h1>Mathegraphical</h1><p class="subtitle">A minimalistic, compact, and customizable calculator</p></div></div><div class="hint">Find the discounted price</div></header>
+		<main class="tool-main money-main">
+			<section class="tool-panel converter-panel">
+				<p class="eyebrow">Discount calculator</p><h2>What is the sale price?</h2>
+				<label class="text-input-label" for="full-price">Full price</label>
+				<input class="amount-input" id="full-price" type="number" min="0" step="any" value="10">
+				<label class="text-input-label" for="discount-percent">Discount %</label>
+				<input class="amount-input" id="discount-percent" type="number" min="0" max="100" step="any" value="50">
+				<div class="conversion-result">
+					<span id="result-label">$10.00 with 50% off</span>
+					<strong id="result">$5.00</strong>
+				</div>
+				<p class="tool-status" id="money-status">You save $5.00.</p>
+			</section>
+		</main>
+	</div>
+	<nav class="side-tabs" aria-label="Calculator navigation">
+		<a class="side-tab" href="index.html">Home</a>
+		<a class="side-tab" href="graphingcalculator.html">Graphing</a>
+		<a class="side-tab" href="regularcalculator.html">Regular</a>
+		<a class="side-tab" href="scientificcalculator.html">Scientific</a>
+		<a class="side-tab" href="colorcalculator.html">Color</a>
+		<a class="side-tab" href="moneyconverter.html">Money</a>
+		<a class="side-tab active" href="discountcalculator.html" aria-current="page">Discount</a>
+	</nav>
+	<div class="settings-launcher"><section class="settings-panel" id="settings-panel" hidden aria-labelledby="settings-title"><button class="settings-close" id="settings-close" type="button" aria-label="Close settings">×</button><h2 id="settings-title">Settings</h2><div class="settings-content"><p class="settings-section-title">Colors</p><label class="color-setting">Accent <input type="color" data-color-variable="--accent" value="#e85d45"></label><label class="color-setting">Ink <input type="color" data-color-variable="--ink" value="#152333"></label><label class="color-setting">Paper <input type="color" data-color-variable="--paper" value="#f5f1e9"></label><label class="color-setting">Panel <input type="color" data-color-variable="--panel" value="#fffdf8"></label><p class="settings-section-title">Typography</p><label class="font-setting">Font family <select id="font-family"><option value="Georgia">Georgia</option><option value="Arial">Arial</option><option value="Verdana">Verdana</option><option value="Courier New">Courier New</option></select></label><label class="font-setting">Font size <span><input id="font-size" type="range" min="13" max="22" value="16"><output id="font-size-value">16px</output></span></label><label class="font-setting">Line spacing <span><input id="line-height" type="range" min="1" max="2" step=".1" value="1.4"><output id="line-height-value">1.4</output></span></label><p class="settings-section-title">Display</p><label class="font-setting">Decimal places <select id="decimal-places"><option value="auto">Automatic</option><option value="0">0 decimal places</option><option value="1">1 decimal place</option><option value="2">2 decimal places</option><option value="3">3 decimal places</option><option value="4">4 decimal places</option><option value="5">5 decimal places</option><option value="6">6 decimal places</option><option value="7">7 decimal places</option><option value="8">8 decimal places</option><option value="9">9 decimal places</option><option value="10">10 decimal places</option></select></label><label class="font-setting">Theme <select id="theme-mode"><option value="light">Light mode</option><option value="dark">Dark mode</option><option value="system">System default</option></select></label><label class="font-setting">Button style <select id="button-style"><option value="rounded">Rounded</option><option value="square">Square</option><option value="pill">Pill-shaped</option></select></label></div><button class="settings-reset" id="settings-reset" type="button">Reset settings</button></section><button class="settings-toggle" id="settings-toggle" type="button" aria-expanded="false" aria-controls="settings-panel">Settings</button></div>
+	<script>
+		const fullPriceInput = document.getElementById('full-price');
+		const discountInput = document.getElementById('discount-percent');
+		const STORAGE_KEY = 'mathegraphical-discount-state';
+
+		function formatCurrency(value) {
+			return new Intl.NumberFormat('en-US', {
+				style: 'currency',
+				currency: 'USD'
+			}).format(value);
+		}
+
+		function saveState() {
+			try {
+				localStorage.setItem(STORAGE_KEY, JSON.stringify({
+					fullPrice: fullPriceInput.value,
+					discount: discountInput.value
+				}));
+			} catch {
+				// Ignore storage failures.
+			}
+		}
+
+		function restoreState() {
+			try {
+				const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+				if (typeof saved.fullPrice === 'string') fullPriceInput.value = saved.fullPrice;
+				if (typeof saved.discount === 'string') discountInput.value = saved.discount;
+			} catch {
+				// Ignore invalid storage.
+			}
+		}
+
+		function calculate() {
+			const fullPrice = Number(fullPriceInput.value) || 0;
+			const discountPercent = Number(discountInput.value) || 0;
+			const safeDiscount = Math.min(Math.max(discountPercent, 0), 100);
+			const salePrice = fullPrice * (1 - safeDiscount / 100);
+			const savings = fullPrice - salePrice;
+
+			document.getElementById('result-label').textContent = `${formatCurrency(fullPrice)} with ${safeDiscount.toFixed(1).replace(/\.0$/, '')}% off`;
+			document.getElementById('result').textContent = formatCurrency(salePrice);
+			document.getElementById('money-status').textContent = `You save ${formatCurrency(savings)}.`;
+			saveState();
+		}
+
+		fullPriceInput.addEventListener('input', calculate);
+		discountInput.addEventListener('input', calculate);
+		restoreState();
+		calculate();
+	</script>
+	<script src="settings.js"></script>
+</body>
+</html>

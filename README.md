@@ -121,6 +121,18 @@ USD  EUR  GBP  JPY  CAD  AUD  CHF  CNY  INR  MXN
 
 The converter uses an indicative rate table stored in `moneyconverter.html`. It does not connect to a live exchange-rate service, so rates may not reflect current market values.
 
+### Discount calculator
+
+`discountcalculator.html` calculates a sale price from a full price and a percentage discount.
+
+- Enter the original price.
+- Enter the percentage discount.
+- See the sale price update instantly.
+- Read the amount saved from the original price.
+- Example: $10 with a 50% discount becomes $5.
+
+This calculator stores the current inputs in browser `localStorage` so the values persist when switching between tools.
+
 ## Shared Interface
 
 Every calculator page includes:
@@ -218,6 +230,7 @@ The settings can be reset back to the original defaults from the Settings panel 
 - `graphingcalculator.html` - Interactive function and implicit-equation grapher.
 - `regularcalculator.html` - Basic arithmetic calculator.
 - `scientificcalculator.html` - Scientific calculator with functions and angle modes.
+- `discountcalculator.html` - Sale price calculator using a full price and percentage discount.
 - `colorcalculator.html` - Color picker and RGB, CMY, and hex converter.
 - `moneyconverter.html` - Offline currency converter.
 - `styles.css` - Shared layout, navigation, calculator, tool, and responsive styles.
