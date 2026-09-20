@@ -1,4 +1,3 @@
-js
 const CACHE_NAME = 'mathegraphical-cache-__VERSION__';
 
 const urlsToCache = [
