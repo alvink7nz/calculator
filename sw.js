@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mathegraphical-cache-v1';
+const CACHE_NAME = 'mathegraphical-cache-v2';
 const urlsToCache = [
   '.',
   'index.html',
