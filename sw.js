@@ -1,4 +1,6 @@
-const CACHE_NAME = 'mathegraphical-cache-v2';
+js
+const CACHE_NAME = 'mathegraphical-cache-__VERSION__';
+
 const urlsToCache = [
   '.',
   'index.html',
@@ -12,6 +14,8 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
   );
+
+  self.skipWaiting();
 });
 
 // Activate worker and clean up old caches
@@ -27,6 +31,8 @@ self.addEventListener('activate', event => {
       );
     })
   );
+
+  self.clients.claim();
 });
 
 // Serve cached content when offline, fallback to network
