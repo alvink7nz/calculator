@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mathegraphical-cache-__VERSION__';
+const CACHE_NAME = 'mathegraphical-cache-afeeeb0';
 
 const urlsToCache = [
   '.',
