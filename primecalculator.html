@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Calculator | A minimalistic, compact, and customizable calculator</title>
+  <title>Mathegraphical | Prime calculator</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -11,36 +11,32 @@
     <header>
       <div class="brand">
         <img class="mark" src="mathegraphicallogo.svg" alt="Mathegraphical logo">
-        <div><h1>Mathegraphical</h1><p class="subtitle">A minimalistic, compact, and customizable calculator</p></div>
+        <div>
+          <h1>Mathegraphical</h1>
+          <p class="subtitle">A minimalistic, compact, and customizable calculator</p>
+        </div>
       </div>
-      <div class="hint">Keyboard supported</div>
+      <div class="hint">Check if a number is prime</div>
     </header>
-    <main class="calculator-main">
-      <section class="calculator" aria-label="Calculator">
-        <input id="display" type="text" value="0" aria-label="Calculator display" readonly>
-        <section class="keys">
-          <button class="clear" data-action="clear">C</button>
-          <button data-action="backspace">⌫</button>
-          <button class="operator" data-value="%">%</button>
-          <button class="operator" data-value="÷">÷</button>
-          <button data-value="7">7</button><button data-value="8">8</button>
-          <button data-value="9">9</button><button class="operator" data-value="×">×</button>
-          <button data-value="4">4</button><button data-value="5">5</button>
-          <button data-value="6">6</button><button class="operator" data-value="−">−</button>
-          <button data-value="1">1</button><button data-value="2">2</button>
-          <button data-value="3">3</button><button class="operator" data-value="+">+</button>
-          <button data-value="0">0</button><button data-value=".">.</button>
-          <button class="equals" data-action="equals">=</button>
-        </section>
+    <main class="prime-main">
+      <section class="tool-panel prime-panel" aria-label="Prime calculator section">
+        <p class="eyebrow">Prime calculator</p>
+        <h2>Is this number prime?</h2>
+        <label class="text-input-label" for="prime-input">Number</label>
+        <div class="prime-controls">
+          <input class="prime-input" id="prime-input" type="number" min="0" step="1" value="2" placeholder="Enter a number">
+          <button class="prime-button" id="prime-button" type="button">Check</button>
+        </div>
+        <div id="prime-result" class="prime-status" aria-live="polite">Enter a whole number to check.</div>
       </section>
     </main>
   </div>
   <nav class="side-tabs" aria-label="Calculator navigation">
     <a class="side-tab" href="index.html">Home</a>
     <a class="side-tab" href="graphingcalculator.html">Graphing</a>
-    <a class="side-tab active" href="regularcalculator.html" aria-current="page">Regular</a>
+    <a class="side-tab" href="regularcalculator.html">Regular</a>
     <a class="side-tab" href="scientificcalculator.html">Scientific</a>
-    <a class="side-tab" href="primecalculator.html">Prime</a>
+    <a class="side-tab active" href="primecalculator.html" aria-current="page">Prime</a>
     <a class="side-tab" href="colorcalculator.html">Color</a>
     <a class="side-tab" href="moneyconverter.html">Money</a>
     <a class="side-tab" href="discountcalculator.html">Discount</a>
@@ -48,7 +44,7 @@
   <div class="settings-launcher">
     <section class="settings-panel" id="settings-panel" hidden aria-labelledby="settings-title">
       <button class="settings-close" id="settings-close" type="button" aria-label="Close settings">×</button>
-      <h2 id="settings-title">Colors</h2>
+      <h2 id="settings-title">Settings</h2>
       <div class="settings-content">
         <p class="settings-section-title">Colors</p>
         <label class="color-setting">Accent <input type="color" data-color-variable="--accent" value="#e85d45"></label>
@@ -69,13 +65,34 @@
     <button class="settings-toggle" id="settings-toggle" type="button" aria-expanded="false" aria-controls="settings-panel">Settings</button>
   </div>
   <script>
-    const display = document.getElementById('display');
-    const STORAGE_KEY = 'mathegraphical-regular-state';
-    let expression = '';
+    const primeInput = document.getElementById('prime-input');
+    const primeResult = document.getElementById('prime-result');
+    const primeButton = document.getElementById('prime-button');
+    const STORAGE_KEY = 'mathegraphical-prime-state';
+
+    function isPrime(num) {
+      if (!Number.isInteger(num) || num < 2) {
+        return false;
+      }
+      if (num === 2) {
+        return true;
+      }
+      if (num % 2 === 0) {
+        return false;
+      }
+
+      const limit = Math.sqrt(num);
+      for (let i = 3; i <= limit; i += 2) {
+        if (num % i === 0) {
+          return false;
+        }
+      }
+      return true;
+    }
 
     function saveState() {
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({ expression }));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ value: primeInput.value }));
       } catch {
         // Ignore storage failures.
       }
@@ -84,57 +101,62 @@
     function restoreState() {
       try {
         const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-        if (typeof saved.expression === 'string') expression = saved.expression;
+        if (typeof saved.value === 'string') primeInput.value = saved.value;
       } catch {
-        expression = '';
+        primeInput.value = '2';
       }
     }
 
-    function formatResult(value) {
-      const selected = window.mathegraphicalSettings?.get('--decimal-places', 'auto') || 'auto';
-      if (selected === 'auto') return String(Number(value.toFixed(10)));
-      const places = Number(selected);
-      return Number.isFinite(places) ? value.toFixed(places) : String(Number(value.toFixed(10)));
+    function setResult(message, type = 'neutral') {
+      primeResult.textContent = message;
+      primeResult.className = 'prime-status';
+      if (type === 'success') {
+        primeResult.classList.add('success');
+      } else if (type === 'error') {
+        primeResult.classList.add('error');
+      }
     }
 
-    function render() { display.value = expression || '0'; }
-    function calculate() {
-      try {
-        const result = Function(`"use strict"; return (${expression.replaceAll('×', '*').replaceAll('÷', '/').replaceAll('−', '-')})`)();
-        if (!Number.isFinite(result)) throw new Error();
-        expression = formatResult(result);
-      } catch { expression = ''; display.value = 'Error'; }
-      saveState();
-      render();
-    }
-    document.querySelector('.keys').addEventListener('click', event => {
-      const button = event.target.closest('button');
-      if (!button) return;
-      const { action } = button.dataset;
-      if (action === 'clear') expression = '';
-      else if (action === 'backspace') expression = expression.slice(0, -1);
-      else if (action === 'equals') return calculate();
-      else {
-        const value = button.dataset.value;
-        if (value === '.' && /\d*\.\d*$/.test(expression.split(/[+−×÷%]/).pop())) return;
-        expression += value;
+    function checkPrime() {
+      const rawValue = primeInput.value.trim();
+      const value = Number(rawValue);
+
+      if (rawValue === '') {
+        setResult('Please enter a number.', 'error');
+        saveState();
+        return;
       }
+
+      if (!Number.isInteger(value)) {
+        setResult('Please enter a whole number.', 'error');
+        saveState();
+        return;
+      }
+
+      if (isPrime(value)) {
+        setResult(`${value} is a prime number.`, 'success');
+      } else {
+        setResult(`${value} is not a prime number.`, 'error');
+      }
+
       saveState();
-      render();
+    }
+
+    primeButton.addEventListener('click', checkPrime);
+    primeInput.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        checkPrime();
+      }
     });
-    document.addEventListener('keydown', event => {
-      const key = event.key;
-      if (/^[0-9.]$/.test(key)) expression += key;
-      else if ('+-*/%'.includes(key)) expression += key.replace('*', '×').replace('/', '÷').replace('-', '−');
-      else if (key === 'Enter' || key === '=') return calculate();
-      else if (key === 'Backspace') expression = expression.slice(0, -1);
-      else if (key === 'Escape') expression = '';
-      else return;
+    primeInput.addEventListener('input', () => {
       saveState();
-      render();
+      if (primeInput.value.trim() === '') {
+        setResult('Enter a whole number to check.', 'neutral');
+      }
     });
+
     restoreState();
-    render();
+    checkPrime();
   </script>
   <script src="settings.js"></script>
 </body>
