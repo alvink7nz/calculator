@@ -237,6 +237,19 @@ canvas.dragging { cursor: grabbing; }
 .prime-status { min-height: 52px; margin-top: 18px; padding: 14px 16px; border: 1px solid var(--line); background: #f7f3ee; color: var(--ink); font: 15px/1.5 Arial, sans-serif; }
 .prime-status.success { border-color: #9bd1ad; background: #ecf9f1; color: #1a7d4d; }
 .prime-status.error { border-color: #e9b7b0; background: #fdf1ef; color: #b34e3d; }
+.divisibility-main { width: min(620px, 100%); margin: 0 auto; padding: 28px 16px 48px; display: grid; align-items: start; }
+.divisibility-panel { padding: 28px; background: var(--panel); border: 1px solid var(--line); }
+.divisibility-panel h2 { margin: 0 0 18px; font-size: 30px; font-weight: 400; }
+.divisibility-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.divisibility-field { display: grid; gap: 8px; }
+.divisibility-field.full { grid-column: 1 / -1; }
+.divisibility-input { width: 100%; padding: 12px 14px; border: 1px solid var(--line); background: #fff; color: var(--ink); font: 20px Georgia, serif; }
+.divisibility-input:focus { outline: 2px solid #f3b6aa; border-color: var(--accent); }
+.divisibility-button { width: 100%; margin-top: 12px; padding: 12px 16px; color: #fff; background: var(--accent); font: 700 13px Arial, sans-serif; }
+.divisibility-button:hover { background: var(--accent-dark); }
+.divisibility-status { min-height: 52px; margin-top: 18px; padding: 14px 16px; border: 1px solid var(--line); background: #f7f3ee; color: var(--ink); font: 15px/1.5 Arial, sans-serif; }
+.divisibility-status.success { border-color: #9bd1ad; background: #ecf9f1; color: #1a7d4d; }
+.divisibility-status.error { border-color: #e9b7b0; background: #fdf1ef; color: #b34e3d; }
 .scientific-placeholder { padding: 28px; }
 .scientific-placeholder h2 { margin-bottom: 12px; font-size: 30px; }
 .scientific-copy { max-width: 38ch; margin: 0 0 24px; color: var(--muted); font: 15px/1.6 Arial, sans-serif; }

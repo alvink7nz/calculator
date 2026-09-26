@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mathegraphical | A minimalistic, compact, and customizable calcualtor</title>
+  <title>Mathegraphical | Divisibility calculator</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -16,32 +16,43 @@
           <p class="subtitle">A minimalistic, compact, and customizable calculator</p>
         </div>
       </div>
-      <div class="hint">Check if a number is prime</div>
+      <div class="hint">Check whether one number divides another</div>
     </header>
-    <main class="prime-main">
-      <section class="tool-panel prime-panel" aria-label="Prime calculator section">
-        <p class="eyebrow">Prime calculator</p>
-        <h2>Is this number prime?</h2>
-        <label class="text-input-label" for="prime-input">Number</label>
-        <div class="prime-controls">
-          <input class="prime-input" id="prime-input" type="number" min="0" step="1" value="2" placeholder="Enter a number">
-          <button class="prime-button" id="prime-button" type="button">Check</button>
+    <main class="divisibility-main">
+      <section class="tool-panel divisibility-panel" aria-label="Divisibility calculator section">
+        <p class="eyebrow">Divisibility calculator</p>
+        <h2>Is the number divisible?</h2>
+
+        <div class="divisibility-grid">
+          <label class="divisibility-field" for="dividend-input">
+            <span class="text-input-label">Number</span>
+            <input class="divisibility-input" id="dividend-input" type="number" step="1" value="42" placeholder="Enter a number">
+          </label>
+
+          <label class="divisibility-field" for="divisor-input">
+            <span class="text-input-label">Divisor</span>
+            <input class="divisibility-input" id="divisor-input" type="number" step="1" value="7" placeholder="Enter a divisor">
+          </label>
         </div>
-        <div id="prime-result" class="prime-status" aria-live="polite">Enter a whole number to check.</div>
+
+        <button class="divisibility-button" id="divisibility-button" type="button">Check</button>
+        <div id="divisibility-result" class="divisibility-status" aria-live="polite">Enter two whole numbers to check.</div>
       </section>
     </main>
   </div>
+
   <nav class="side-tabs" aria-label="Calculator navigation">
     <a class="side-tab" href="index.html">Home</a>
     <a class="side-tab" href="graphingcalculator.html">Graphing</a>
     <a class="side-tab" href="regularcalculator.html">Regular</a>
     <a class="side-tab" href="scientificcalculator.html">Scientific</a>
-    <a class="side-tab active" href="primecalculator.html" aria-current="page">Prime</a>
-    <a class="side-tab" href="divisibilitycalcualtor.html">Divisibility</a>
+    <a class="side-tab" href="primecalculator.html">Prime</a>
+    <a class="side-tab active" href="divisibilitycalcualtor.html" aria-current="page">Divisibility</a>
     <a class="side-tab" href="colorcalculator.html">Color</a>
     <a class="side-tab" href="moneyconverter.html">Money</a>
     <a class="side-tab" href="discountcalculator.html">Discount</a>
   </nav>
+
   <div class="settings-launcher">
     <section class="settings-panel" id="settings-panel" hidden aria-labelledby="settings-title">
       <button class="settings-close" id="settings-close" type="button" aria-label="Close settings">×</button>
@@ -65,35 +76,20 @@
     </section>
     <button class="settings-toggle" id="settings-toggle" type="button" aria-expanded="false" aria-controls="settings-panel">Settings</button>
   </div>
+
   <script>
-    const primeInput = document.getElementById('prime-input');
-    const primeResult = document.getElementById('prime-result');
-    const primeButton = document.getElementById('prime-button');
-    const STORAGE_KEY = 'mathegraphical-prime-state';
-
-    function isPrime(num) {
-      if (!Number.isInteger(num) || num < 2) {
-        return false;
-      }
-      if (num === 2) {
-        return true;
-      }
-      if (num % 2 === 0) {
-        return false;
-      }
-
-      const limit = Math.sqrt(num);
-      for (let i = 3; i <= limit; i += 2) {
-        if (num % i === 0) {
-          return false;
-        }
-      }
-      return true;
-    }
+    const dividendInput = document.getElementById('dividend-input');
+    const divisorInput = document.getElementById('divisor-input');
+    const divisibilityResult = document.getElementById('divisibility-result');
+    const divisibilityButton = document.getElementById('divisibility-button');
+    const STORAGE_KEY = 'mathegraphical-divisibility-state';
 
     function saveState() {
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({ value: primeInput.value }));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({
+          dividend: dividendInput.value,
+          divisor: divisorInput.value
+        }));
       } catch {
         // Ignore storage failures.
       }
@@ -102,62 +98,89 @@
     function restoreState() {
       try {
         const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-        if (typeof saved.value === 'string') primeInput.value = saved.value;
+        if (typeof saved.dividend === 'string') dividendInput.value = saved.dividend;
+        if (typeof saved.divisor === 'string') divisorInput.value = saved.divisor;
       } catch {
-        primeInput.value = '2';
+        dividendInput.value = '42';
+        divisorInput.value = '7';
       }
     }
 
     function setResult(message, type = 'neutral') {
-      primeResult.textContent = message;
-      primeResult.className = 'prime-status';
+      divisibilityResult.textContent = message;
+      divisibilityResult.className = 'divisibility-status';
       if (type === 'success') {
-        primeResult.classList.add('success');
+        divisibilityResult.classList.add('success');
       } else if (type === 'error') {
-        primeResult.classList.add('error');
+        divisibilityResult.classList.add('error');
       }
     }
 
-    function checkPrime() {
-      const rawValue = primeInput.value.trim();
-      const value = Number(rawValue);
+    function checkDivisibility() {
+      const dividendText = dividendInput.value.trim();
+      const divisorText = divisorInput.value.trim();
 
-      if (rawValue === '') {
-        setResult('Please enter a number.', 'error');
+      if (dividendText === '' || divisorText === '') {
+        setResult('Please enter both a number and a divisor.', 'error');
         saveState();
         return;
       }
 
-      if (!Number.isInteger(value)) {
-        setResult('Please enter a whole number.', 'error');
+      const dividend = Number(dividendText);
+      const divisor = Number(divisorText);
+
+      if (!Number.isInteger(dividend) || !Number.isInteger(divisor)) {
+        setResult('Please enter whole numbers only.', 'error');
         saveState();
         return;
       }
 
-      if (isPrime(value)) {
-        setResult(`${value} is a prime number.`, 'success');
+      if (divisor === 0) {
+        setResult('A divisor of 0 is not allowed.', 'error');
+        saveState();
+        return;
+      }
+
+      const remainder = Math.abs(dividend) % Math.abs(divisor);
+      const isDivisible = remainder === 0;
+      const absoluteDividend = Math.abs(dividend);
+      const absoluteDivisor = Math.abs(divisor);
+
+      if (isDivisible) {
+        setResult(`${absoluteDividend} is divisible by ${absoluteDivisor}.`, 'success');
       } else {
-        setResult(`${value} is not a prime number.`, 'error');
+        setResult(`${absoluteDividend} is not divisible by ${absoluteDivisor}. Remainder: ${remainder}.`, 'error');
       }
 
       saveState();
     }
 
-    primeButton.addEventListener('click', checkPrime);
-    primeInput.addEventListener('keydown', (event) => {
+    divisibilityButton.addEventListener('click', checkDivisibility);
+    dividendInput.addEventListener('keydown', (event) => {
       if (event.key === 'Enter') {
-        checkPrime();
+        checkDivisibility();
       }
     });
-    primeInput.addEventListener('input', () => {
+    divisorInput.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        checkDivisibility();
+      }
+    });
+    dividendInput.addEventListener('input', () => {
       saveState();
-      if (primeInput.value.trim() === '') {
-        setResult('Enter a whole number to check.', 'neutral');
+      if (dividendInput.value.trim() === '') {
+        setResult('Enter two whole numbers to check.', 'neutral');
+      }
+    });
+    divisorInput.addEventListener('input', () => {
+      saveState();
+      if (divisorInput.value.trim() === '') {
+        setResult('Enter two whole numbers to check.', 'neutral');
       }
     });
 
     restoreState();
-    checkPrime();
+    checkDivisibility();
   </script>
   <script src="settings.js"></script>
 </body>
